@@ -26,6 +26,7 @@ export const StateContextProvider = ({ children }) => {
     const checkIfWalletIsConnected = async () => {
         try {
             if (!window.ethereum) return notifyError('No Account Found');
+            await handleNetworkSwitch();
             const accounts = await window.ethereum.request({ method: 'eth_accounts' });
             if (accounts.length) {
                 setAddress(accounts[0]);
@@ -43,9 +44,14 @@ export const StateContextProvider = ({ children }) => {
         }
     }
 
+    useEffect(() => {
+        checkIfWalletIsConnected();
+    }, [address])
+
     const connectWallet = async () => {
         try {
             if (!window.ethereum) return notifyError('No Account Found');
+            await handleNetworkSwitch();
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             if (accounts.length) {
                 setAddress(accounts[0]);
@@ -238,6 +244,8 @@ export const StateContextProvider = ({ children }) => {
             setLoader(true);
             notifySuccess('Buying Token...');
 
+            if (!tokenAddress || !tokenQuantity) return notifyError('Please fill all the fields');
+
             const address = await connectWallet();
             const contract = await COINFLOAT_CONTRACT();
 
@@ -280,7 +288,7 @@ export const StateContextProvider = ({ children }) => {
             setLoader(true);
             notifySuccess('Transferring Token...');
             const address = await connectWallet();
-            const contract = await COINFLOAT_CONTRACT();
+            const contract = await TOKEN_CONTRACT(transferTokenData.tokenAddress);
             const _availableBalance = await contract.balanceOf(address);
             const availableToken = ethers.utils.formatEther(_availableBalance.toString());
 
@@ -335,7 +343,7 @@ export const StateContextProvider = ({ children }) => {
         }
     }
 
-    return <StateContext.Provider value={{}}>{children}</StateContext.Provider>;
+    return <StateContext.Provider value={{withdrawToken, buyToken, shortenAddress, transferToken, createICOSale, GET_ALL_ICO_TOKENS, GET_ALL_ICO_USERS, createERC20, connectWallet, notifySuccess, notifyError, address, setAddress, accountBalance, setAccountBalance, loader, setLoader, recall, setRecall, currency, setCurrency, openBuyToken, setOpenBuyToken, openWithdrawToken, setOpenWithdrawToken, openTransferToken, setOpenTransferToken, openTokenCreator, setOpenTokenCreator, openCreateICO, setOpenCreateICO, PINATA_API_KEY, PINATA_API_SECRET, COINFLOAT_ADDRESS}}>{children}</StateContext.Provider>;
 }
 
 

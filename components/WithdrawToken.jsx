@@ -1,7 +1,7 @@
 import React from "react";
 
-const WidthdrawToken = () => {
+const WithdrawToken = () => {
   return <div>WidthdrawToken</div>;
 };
 
-export default WidthdrawToken;
+export default WithdrawToken;
